@@ -5,6 +5,13 @@ using namespace std;
 
 #define SIZE (10)
 
+static void MissingValues(int* p_array_s32, const int size_s32);
+static void removeDuplicates(int* p_array_s32, const int size_s32);
+static int FirstRepeated(int* p_array_s32, const int size_s32);
+static int linearSearchUnsorted(int* p_array_s32, const int size_s32, const int value_s32);
+static void swap(int* p_array_s32, const int a_s32, const int b_s32);
+static void QuickSortUtil(int* p_array_s32, int lower_s32, int upper_s32);
+static void QuickSort(int* p_array_s32, const int size_s32);
 static void PrintArray(const int* p_array_s32, const int size_s32);
 static void BubbleSort(int* p_array_s32, const int size_s32);
 static int ArrayIndexMaxDiff(const int* p_array_s32, const int size_s32);
@@ -19,6 +26,10 @@ int main()
     static int sa_inp_1_s32[SIZE];
     static int sa_inp_2_s32[SIZE];
     static int sa_inp_3_s32[SIZE];
+    static int sa_inp_4_s32[SIZE];
+    static int sa_inp_5_s32[SIZE];
+    static int sa_inp_6_s32[SIZE];
+    static int sa_inp_7_s32[SIZE];
     int i_s32 = 0;
 
     for (i_s32 = 0; i_s32 < SIZE; i_s32++)
@@ -40,6 +51,28 @@ int main()
     sa_inp_2_s32[8] = 4;
     sa_inp_2_s32[9] = 6;
     memcpy(sa_inp_3_s32, sa_inp_2_s32, SIZE * sizeof(int));
+    memcpy(sa_inp_4_s32, sa_inp_2_s32, SIZE * sizeof(int));
+    sa_inp_5_s32[0] = 7;
+    sa_inp_5_s32[1] = 1;
+    sa_inp_5_s32[2] = 2;
+    sa_inp_5_s32[3] = 2;
+    sa_inp_5_s32[4] = 3;
+    sa_inp_5_s32[5] = 4;
+    sa_inp_5_s32[6] = 4;
+    sa_inp_5_s32[7] = 4;
+    sa_inp_5_s32[8] = 4;
+    sa_inp_5_s32[9] = 6;
+    memcpy(sa_inp_6_s32, sa_inp_5_s32, SIZE * sizeof(int));
+    sa_inp_7_s32[0] = 8;
+    sa_inp_7_s32[1] = 1;
+    sa_inp_7_s32[2] = 11;
+    sa_inp_7_s32[3] = 0;
+    sa_inp_7_s32[4] = 12;
+    sa_inp_7_s32[5] = 9;
+    sa_inp_7_s32[6] = 5;
+    sa_inp_7_s32[7] = 6;
+    sa_inp_7_s32[8] = 4;
+    sa_inp_7_s32[9] = 7;
 
     cout << "SumArray: " << SumArray(sa_inp_0_s32, SIZE) << "\n";
     cout << "SequentialSearch: " << SequentialSearch(sa_inp_0_s32, SIZE, 5) << "\n";
@@ -48,6 +81,155 @@ int main()
     cout << "ArrayIndexMaxDiff: " << ArrayIndexMaxDiff(sa_inp_2_s32, SIZE) << "\n";
     BubbleSort(sa_inp_3_s32, SIZE);
     PrintArray(sa_inp_3_s32, SIZE);
+    QuickSort(sa_inp_4_s32, SIZE);
+    PrintArray(sa_inp_4_s32, SIZE);
+    cout << "linearSearchUnsorted: " << linearSearchUnsorted(sa_inp_2_s32, SIZE, 5) << "\n";
+    cout << "FirstRepeated: " << FirstRepeated(sa_inp_5_s32, SIZE) << "\n";
+    removeDuplicates(sa_inp_6_s32, SIZE);
+    PrintArray(sa_inp_6_s32, SIZE);
+    MissingValues(sa_inp_7_s32, SIZE);
+}
+
+static void MissingValues(int* p_array_s32, const int size_s32)
+{
+    int i_s32 = 0;
+    int j_s32 = 0;
+    int value_s32 = 0;
+    int temp_s32 = 0;
+
+    QuickSort(p_array_s32, size_s32);
+
+    value_s32 = p_array_s32[0];
+
+    for (i_s32 = 1; i_s32 < size_s32; i_s32++)
+    {
+        if (value_s32 == p_array_s32[i_s32])
+        {
+            // the same
+        }
+        else if ((value_s32 + 1) == p_array_s32[i_s32])
+        {
+            // sequential
+            value_s32++;
+        }
+        else
+        {
+            // missing 2 or more
+            temp_s32 = value_s32;
+            for (j_s32 = temp_s32; j_s32 < (p_array_s32[i_s32] - 1); j_s32++)
+            {
+                value_s32++;
+                printf("missing: %d\n", value_s32);
+            }
+            value_s32++;
+        }
+    }
+}
+
+static void removeDuplicates(int* p_array_s32, const int size_s32)
+{
+    int i_s32 = 0;
+    int j_s32 = 0;
+
+    QuickSort(p_array_s32, size_s32);
+
+    for (i_s32 = 1; i_s32 < size_s32; i_s32++)
+    {
+        if (p_array_s32[i_s32] != p_array_s32[j_s32])
+        {
+            j_s32++;
+            p_array_s32[j_s32] = p_array_s32[i_s32];
+        }
+    }
+}
+
+static int FirstRepeated(int* p_array_s32, const int size_s32)
+{
+    int i_s32 = 0;
+    int j_s32 = 0;
+    int ret_s32 = 0;
+
+    for (i_s32 = 0; i_s32 < size_s32; i_s32++)
+    {
+        for (j_s32 = (i_s32 + 1); j_s32 < size_s32; j_s32++)
+        {
+            if (p_array_s32[i_s32] == p_array_s32[j_s32])
+            {
+                ret_s32 = p_array_s32[i_s32];
+
+                break;
+            }
+        }
+        if (0 != ret_s32)
+        {
+            break;
+        }
+    }
+
+    return ret_s32;
+}
+
+static int linearSearchUnsorted(int* p_array_s32, const int size_s32, const int value_s32)
+{
+    int i_s32 = 0;
+    int ret_s32 = 0;
+
+    for (i_s32 = 0; i_s32 < size_s32; i_s32++)
+    {
+        if (value_s32 == p_array_s32[i_s32])
+        {
+            ret_s32 = 1;
+
+            break;
+        }
+    }
+
+    return ret_s32;
+}
+
+static void swap(int* p_array_s32, const int a_s32, const int b_s32)
+{
+    int temp_s32 = p_array_s32[a_s32];
+
+    p_array_s32[a_s32] = p_array_s32[b_s32];
+    p_array_s32[b_s32] = temp_s32;
+}
+
+static void QuickSortUtil(int* p_array_s32, int lower_s32, int upper_s32)
+{
+    int pivot_s32 = p_array_s32[lower_s32];
+    int start_s32 = lower_s32;
+    int stop_s32 = upper_s32;
+
+    if (upper_s32 <= lower_s32)
+    {
+        return;
+    }
+
+    while (lower_s32 < upper_s32)
+    {
+        while (p_array_s32[lower_s32] <= pivot_s32)
+        {
+            lower_s32++;
+        }
+        while (p_array_s32[upper_s32] > pivot_s32)
+        {
+            upper_s32--;
+        }
+        if (lower_s32 < upper_s32)
+        {
+            swap(p_array_s32, upper_s32, lower_s32);
+        }
+    }
+
+    swap(p_array_s32, upper_s32, start_s32);
+    QuickSortUtil(p_array_s32, start_s32, upper_s32 - 1);
+    QuickSortUtil(p_array_s32, upper_s32 + 1, stop_s32);
+}
+
+static void QuickSort(int* p_array_s32, const int size_s32)
+{
+    QuickSortUtil(p_array_s32, 0, size_s32 - 1);
 }
 
 static void PrintArray(const int* p_array_s32, const int size_s32)
