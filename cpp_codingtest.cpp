@@ -5,6 +5,10 @@ using namespace std;
 
 #define SIZE (10)
 
+static void transformArrayAB1(int* p_array_s32, const int size_s32);
+static int getMedian(int* p_array_s32, const int size_s32);
+static int getMax(int* p_array_s32, const int size_s32);
+static int findMinDiff(int* p_array_s32, const int size_s32);
 static void MissingValues(int* p_array_s32, const int size_s32);
 static void removeDuplicates(int* p_array_s32, const int size_s32);
 static int FirstRepeated(int* p_array_s32, const int size_s32);
@@ -30,6 +34,9 @@ int main()
     static int sa_inp_5_s32[SIZE];
     static int sa_inp_6_s32[SIZE];
     static int sa_inp_7_s32[SIZE];
+    static int sa_inp_8_s32[SIZE];
+    static int sa_inp_9_s32[SIZE];
+    static int sa_inp_10_s32[SIZE];
     int i_s32 = 0;
 
     for (i_s32 = 0; i_s32 < SIZE; i_s32++)
@@ -73,6 +80,18 @@ int main()
     sa_inp_7_s32[7] = 6;
     sa_inp_7_s32[8] = 4;
     sa_inp_7_s32[9] = 7;
+    sa_inp_8_s32[0] = 1;
+    sa_inp_8_s32[1] = 10;
+    sa_inp_8_s32[2] = 15;
+    sa_inp_8_s32[3] = 29;
+    sa_inp_8_s32[4] = 77;
+    sa_inp_8_s32[5] = 25;
+    sa_inp_8_s32[6] = 50;
+    sa_inp_8_s32[7] = 55;
+    sa_inp_8_s32[8] = 100;
+    sa_inp_8_s32[9] = 105;
+    memcpy(sa_inp_9_s32, sa_inp_8_s32, SIZE * sizeof(int));
+    memcpy(sa_inp_10_s32, sa_inp_8_s32, SIZE * sizeof(int));
 
     cout << "SumArray: " << SumArray(sa_inp_0_s32, SIZE) << "\n";
     cout << "SequentialSearch: " << SequentialSearch(sa_inp_0_s32, SIZE, 5) << "\n";
@@ -88,6 +107,81 @@ int main()
     removeDuplicates(sa_inp_6_s32, SIZE);
     PrintArray(sa_inp_6_s32, SIZE);
     MissingValues(sa_inp_7_s32, SIZE);
+    cout << "findMinDiff: " << findMinDiff(sa_inp_8_s32, SIZE) << "\n";
+    cout << "getMax: " << getMax(sa_inp_5_s32, SIZE) << "\n";
+    cout << "getMedian: " << getMedian(sa_inp_9_s32, SIZE) << "\n";
+    transformArrayAB1(sa_inp_10_s32, SIZE);
+    PrintArray(sa_inp_10_s32, SIZE);
+}
+
+static void transformArrayAB1(int* p_array_s32, const int size_s32)
+{
+    int n_s32 = size_s32 / 2;
+    int i_s32 = 0;
+    int j_s32 = 0;
+
+    for (i_s32 = 1; i_s32 < n_s32; i_s32++)
+    {
+        for (j_s32 = 0; j_s32 < i_s32; j_s32++)
+        {
+            swap(p_array_s32, n_s32 - i_s32 + (2 * j_s32), n_s32 - i_s32 + (2 * j_s32) + 1);
+        }
+    }
+}
+
+static int getMedian(int* p_array_s32, const int size_s32)
+{
+    QuickSort(p_array_s32, size_s32);
+
+    return p_array_s32[size_s32 / 2];
+}
+
+static int getMax(int* p_array_s32, const int size_s32)
+{
+    int max_s32 = p_array_s32[0];
+    int count_s32 = 1;
+    int maxCount_s32 = 1;
+    int i_s32 = 0;
+    int j_s32 = 0;
+
+    for (i_s32 = 0; i_s32 < size_s32; i_s32++)
+    {
+        count_s32 = 1;
+
+        for (j_s32 = (i_s32 + 1); j_s32 < size_s32; j_s32++)
+        {
+            if (p_array_s32[i_s32] == p_array_s32[j_s32])
+            {
+                count_s32++;
+            }
+        }
+
+        if (count_s32 > maxCount_s32)
+        {
+            max_s32 = p_array_s32[i_s32];
+            maxCount_s32 = count_s32;
+        }
+    }
+
+    return max_s32;
+}
+
+static int findMinDiff(int* p_array_s32, const int size_s32)
+{
+    int diff_s32 = INT_MAX;
+    int i_s32 = 0;
+
+    QuickSort(p_array_s32, size_s32);
+
+    for (i_s32 = 0; i_s32 < (size_s32 - 1); i_s32++)
+    {
+        if (p_array_s32[i_s32 + 1] - p_array_s32[i_s32] < diff_s32)
+        {
+            diff_s32 = p_array_s32[i_s32 + 1] - p_array_s32[i_s32];
+        }
+    }
+
+    return diff_s32;
 }
 
 static void MissingValues(int* p_array_s32, const int size_s32)
