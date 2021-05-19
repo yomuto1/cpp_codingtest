@@ -5,6 +5,18 @@ using namespace std;
 
 #define SIZE (10)
 
+typedef struct Node
+{
+    int value_s32;
+    struct Node* pst_next;
+} ListNode;
+
+static void deleteList(ListNode** pst_head);
+static void deleteNodes(ListNode** pst_head, int delValue_s32);
+static void deleteFirstNodes(ListNode** pst_head);
+static void searchList(ListNode* pst_head, int value_s32);
+static void printList(ListNode* pst_head);
+static int insertNode(ListNode** pst_head, int value_s32);
 static void transformArrayAB1(int* p_array_s32, const int size_s32);
 static int getMedian(int* p_array_s32, const int size_s32);
 static int getMax(int* p_array_s32, const int size_s32);
@@ -112,6 +124,130 @@ int main()
     cout << "getMedian: " << getMedian(sa_inp_9_s32, SIZE) << "\n";
     transformArrayAB1(sa_inp_10_s32, SIZE);
     PrintArray(sa_inp_10_s32, SIZE);
+
+    ListNode* pst_head = (ListNode*)malloc(sizeof(ListNode));
+    pst_head->value_s32 = 0;
+    ListNode* pst_node0 = (ListNode*)malloc(sizeof(ListNode));
+    pst_head->pst_next = pst_node0;
+    pst_node0->value_s32 = 1;
+    ListNode* pst_node1 = (ListNode*)malloc(sizeof(ListNode));
+    pst_node0->pst_next = pst_node1;
+    pst_node1->value_s32 = 2;
+    ListNode* pst_node2 = (ListNode*)malloc(sizeof(ListNode));
+    pst_node1->pst_next = pst_node2;
+    pst_node2->value_s32 = 4;
+    pst_node2->pst_next = NULL;
+    cout << "insertNode: " << insertNode(&pst_head, 3) << "\n";
+    printList(pst_head);
+    searchList(pst_head, 4);
+    deleteFirstNodes(&pst_head);
+    deleteNodes(&pst_head, 4);
+    deleteList(&pst_head);
+}
+
+static void deleteList(ListNode** pst_head)
+{
+    ListNode* pst_deleteMe = *pst_head;
+    ListNode* pst_nextNode;
+
+    while (NULL != pst_deleteMe)
+    {
+        pst_nextNode = pst_deleteMe->pst_next;
+        free(pst_deleteMe);
+        pst_deleteMe = pst_nextNode;
+    }
+
+    *pst_head = NULL;
+}
+
+static void deleteNodes(ListNode** pst_head, int delValue_s32)
+{
+    ListNode* pst_currNode = *pst_head;
+    ListNode* pst_nextNode;
+    ListNode* pst_delNode;
+
+    while ((NULL != pst_currNode) && (delValue_s32 == pst_currNode->value_s32))
+    {
+        *pst_head = pst_currNode->pst_next;
+        pst_delNode = pst_currNode;
+        pst_currNode = pst_currNode->pst_next;
+        free(pst_delNode);
+    }
+
+    while (NULL != pst_currNode)
+    {
+        pst_nextNode = pst_currNode->pst_next;
+        if ((NULL != pst_nextNode) && (delValue_s32 == pst_nextNode->value_s32))
+        {
+            pst_currNode->pst_next = pst_nextNode->pst_next;
+            free(pst_nextNode);
+        }
+        else
+        {
+            pst_currNode = pst_nextNode;
+        }
+    }
+}
+
+static void deleteFirstNodes(ListNode** pst_head)
+{
+    ListNode* pst_currNode = *pst_head;
+    ListNode* pst_nextNode;
+
+    if (NULL != pst_currNode)
+    {
+        pst_nextNode = pst_currNode->pst_next;
+        free(pst_currNode);
+        *pst_head = pst_nextNode;
+    }
+}
+
+static void searchList(ListNode* pst_head, int value_s32)
+{
+    ListNode* pst_temp = pst_head;
+
+    while (NULL != pst_temp)
+    {
+        if (pst_temp->value_s32 == value_s32)
+        {
+            cout << "found value\n";
+        }
+        pst_temp = pst_temp->pst_next;
+    }
+}
+
+static void printList(ListNode* pst_head)
+{
+    ListNode* pst_temp = pst_head;
+
+    while (NULL != pst_temp)
+    {
+        cout << pst_temp->value_s32 << ", ";
+        pst_temp = pst_temp->pst_next;
+    }
+
+    cout << "\n";
+}
+
+static int insertNode(ListNode** pst_head, int value_s32)
+{
+    int ret_s32 = 0;
+    ListNode* pst_tempNode = (ListNode*)malloc(sizeof(ListNode));
+
+    if (NULL == pst_tempNode)
+    {
+        ret_s32 = -1;
+    }
+    else
+    {
+        pst_tempNode->value_s32 = value_s32;
+        pst_tempNode->pst_next = *pst_head;
+        *pst_head = pst_tempNode;
+
+        ret_s32 = 1;
+    }
+
+    return ret_s32;
 }
 
 static void transformArrayAB1(int* p_array_s32, const int size_s32)
