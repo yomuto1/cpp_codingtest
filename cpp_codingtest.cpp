@@ -4,13 +4,43 @@
 using namespace std;
 
 #define SIZE (10)
+#define MAX_CAPACITY (1024)
+#define ERROR_VALUE (INT_MIN)
 
+typedef struct Queue_t
+{
+    int front_s32;
+    int back_s32;
+    int size_s32;
+    int a_data_s32[MAX_CAPACITY];
+} Queue;
+typedef struct stack
+{
+    int top_s32;
+    int a_data_s32[MAX_CAPACITY];
+} Stack;
 typedef struct Node
 {
     int value_s32;
     struct Node* pst_next;
 } ListNode;
 
+static void maxSlidingWindows(int* p_array_s32, const int size_s32, int window_s32);
+static void QueueInitialize(Queue* pst_que);
+static void QueueAdd(Queue* pst_que, int value_s32);
+static int QueueRemove(Queue* pst_que);
+static int QueueFront(Queue* pst_que);
+static int QueueBack(Queue* pst_que);
+static int QueueRemoveBack(Queue* pst_que);
+static int QueueIsEmpty(Queue* pst_que);
+static int QueueSize(Queue* pst_que);
+static void StackInitialize(Stack* pst_stk);
+static int StackEmpty(Stack* pst_stk);
+static int StackSize(Stack* pst_stk);
+static void StackPrint(Stack* pst_stk);
+static void StackPush(Stack* pst_stk, int value_s32);
+static int StackPop(Stack* pst_stk);
+static int StackTop(Stack* pst_stk);
 static void deleteList(ListNode** pst_head);
 static void deleteNodes(ListNode** pst_head, int delValue_s32);
 static void deleteFirstNodes(ListNode** pst_head);
@@ -49,6 +79,7 @@ int main()
     static int sa_inp_8_s32[SIZE];
     static int sa_inp_9_s32[SIZE];
     static int sa_inp_10_s32[SIZE];
+    static int sa_inp_11_s32[SIZE];
     int i_s32 = 0;
 
     for (i_s32 = 0; i_s32 < SIZE; i_s32++)
@@ -104,6 +135,7 @@ int main()
     sa_inp_8_s32[9] = 105;
     memcpy(sa_inp_9_s32, sa_inp_8_s32, SIZE * sizeof(int));
     memcpy(sa_inp_10_s32, sa_inp_8_s32, SIZE * sizeof(int));
+    memcpy(sa_inp_11_s32, sa_inp_8_s32, SIZE * sizeof(int));
 
     cout << "SumArray: " << SumArray(sa_inp_0_s32, SIZE) << "\n";
     cout << "SequentialSearch: " << SequentialSearch(sa_inp_0_s32, SIZE, 5) << "\n";
@@ -143,6 +175,182 @@ int main()
     deleteFirstNodes(&pst_head);
     deleteNodes(&pst_head, 4);
     deleteList(&pst_head);
+
+    Stack st_stk;
+
+    StackInitialize(&st_stk);
+    StackPush(&st_stk, 1);
+    StackPush(&st_stk, 2);
+    StackPush(&st_stk, 4);
+    StackPush(&st_stk, 5);
+    StackPush(&st_stk, 7);
+    StackPrint(&st_stk);
+
+    maxSlidingWindows(sa_inp_11_s32, SIZE, 3);
+}
+
+static void maxSlidingWindows(int* p_array_s32, const int size_s32, int window_s32)
+{
+    Queue st_que;
+    int i_s32 = 0;
+
+    QueueInitialize(&st_que);
+
+    for (i_s32 = 0; i_s32 < size_s32; i_s32++)
+    {
+        if (QueueSize(&st_que) && (QueueFront(&st_que) <= (i_s32 - window_s32)))
+        {
+            QueueRemove(&st_que);
+        }
+        while (QueueSize(&st_que) && (p_array_s32[QueueBack(&st_que)] <= p_array_s32[i_s32]))
+        {
+            QueueRemoveBack(&st_que);
+        }
+        QueueAdd(&st_que, i_s32);
+        if (i_s32 >= (window_s32 - 1))
+        {
+            cout << p_array_s32[QueueFront(&st_que)] << " ";
+        }
+    }
+}
+
+static void QueueInitialize(Queue* pst_que)
+{
+    pst_que->back_s32 = 0;
+    pst_que->front_s32 = 0;
+    pst_que->size_s32 = 0;
+}
+
+static void QueueAdd(Queue* pst_que, int value_s32)
+{
+    if (pst_que->size_s32 > (MAX_CAPACITY - 1))
+    {
+        cout << "queue full!\n";
+    }
+    else
+    {
+        pst_que->size_s32++;
+        pst_que->a_data_s32[pst_que->back_s32] = value_s32;
+        pst_que->back_s32 = (pst_que->back_s32 + 1) % (MAX_CAPACITY - 1);
+    }
+}
+
+static int QueueRemove(Queue* pst_que)
+{
+    int ret_s32 = ERROR_VALUE;
+
+    if (pst_que->size_s32 <= 0)
+    {
+        cout << "queue empty!\n";
+    }
+    else
+    {
+        pst_que->size_s32--;
+        ret_s32 = pst_que->a_data_s32[pst_que->front_s32];
+        pst_que->front_s32 = (pst_que->front_s32 + 1) % (MAX_CAPACITY - 1);
+    }
+
+    return ret_s32;
+}
+
+static int QueueFront(Queue* pst_que)
+{
+    return pst_que->a_data_s32[pst_que->front_s32];
+}
+
+static int QueueBack(Queue* pst_que)
+{
+    return pst_que->a_data_s32[pst_que->back_s32 - 1];
+}
+
+static int QueueRemoveBack(Queue* pst_que)
+{
+    int ret_s32 = ERROR_VALUE;
+
+    if (pst_que->size_s32 <= 0)
+    {
+        cout << "queue empty!\n";
+    }
+    else
+    {
+        pst_que->size_s32--;
+        ret_s32 = pst_que->a_data_s32[pst_que->back_s32 - 1];
+        pst_que->back_s32 = (pst_que->back_s32 - 1) % (MAX_CAPACITY - 1);
+    }
+
+    return ret_s32;
+}
+
+static int QueueIsEmpty(Queue* pst_que)
+{
+    return pst_que->size_s32 == 0;
+}
+
+static int QueueSize(Queue* pst_que)
+{
+    return pst_que->size_s32;
+}
+
+static void StackInitialize(Stack* pst_stk)
+{
+    pst_stk->top_s32 = -1;
+}
+
+static int StackEmpty(Stack* pst_stk)
+{
+    return (pst_stk->top_s32 == -1);
+}
+
+static int StackSize(Stack* pst_stk)
+{
+    return (pst_stk->top_s32 + 1);
+}
+
+static void StackPrint(Stack* pst_stk)
+{
+    int i_s32 = 0;
+
+    for (i_s32 = pst_stk->top_s32; i_s32 >= 0; i_s32--)
+    {
+        cout << pst_stk ->a_data_s32[i_s32] << " ";
+    }
+    cout << "\n";
+}
+
+static void StackPush(Stack* pst_stk, int value_s32)
+{
+    if (pst_stk->top_s32 < (MAX_CAPACITY - 1))
+    {
+        pst_stk->top_s32++;
+        pst_stk->a_data_s32[pst_stk->top_s32] = value_s32;
+    }
+    else
+    {
+        cout << "stack overflow!\n";
+    }
+}
+
+static int StackPop(Stack* pst_stk)
+{
+    int ret_s32 = 0;
+
+    if (pst_stk->top_s32 >= 0)
+    {
+        ret_s32 = pst_stk->a_data_s32[pst_stk->top_s32];
+        pst_stk->top_s32--;
+    }
+    else
+    {
+        cout << "stack empty!\n";
+        ret_s32 = ERROR_VALUE;
+    }
+    
+    return ret_s32;
+}
+
+static int StackTop(Stack* pst_stk)
+{
+    return pst_stk->a_data_s32[pst_stk->top_s32];
 }
 
 static void deleteList(ListNode** pst_head)
