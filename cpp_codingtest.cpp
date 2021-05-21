@@ -7,6 +7,12 @@ using namespace std;
 #define MAX_CAPACITY (1024)
 #define ERROR_VALUE (INT_MIN)
 
+typedef struct tNode
+{
+    int value_s32;
+    struct tNode* pst_lChild;
+    struct tNode* pst_rChild;
+} treeNode;
 typedef struct Queue_t
 {
     int front_s32;
@@ -25,6 +31,10 @@ typedef struct Node
     struct Node* pst_next;
 } ListNode;
 
+static treeNode* freeTree(treeNode* pst_root);
+static void printPreOrder(treeNode* pst_root);
+static treeNode* levelOrderBinaryTreeUtil(int* p_array_s32, const int size_s32, int start_s32);
+static treeNode* levelOrderBinaryTree(int* p_array_s32, const int size_s32);
 static void maxSlidingWindows(int* p_array_s32, const int size_s32, int window_s32);
 static void QueueInitialize(Queue* pst_que);
 static void QueueAdd(Queue* pst_que, int value_s32);
@@ -80,6 +90,7 @@ int main()
     static int sa_inp_9_s32[SIZE];
     static int sa_inp_10_s32[SIZE];
     static int sa_inp_11_s32[SIZE];
+    static int sa_inp_12_s32[SIZE];
     int i_s32 = 0;
 
     for (i_s32 = 0; i_s32 < SIZE; i_s32++)
@@ -136,6 +147,7 @@ int main()
     memcpy(sa_inp_9_s32, sa_inp_8_s32, SIZE * sizeof(int));
     memcpy(sa_inp_10_s32, sa_inp_8_s32, SIZE * sizeof(int));
     memcpy(sa_inp_11_s32, sa_inp_8_s32, SIZE * sizeof(int));
+    memcpy(sa_inp_12_s32, sa_inp_2_s32, SIZE * sizeof(int));
 
     cout << "SumArray: " << SumArray(sa_inp_0_s32, SIZE) << "\n";
     cout << "SequentialSearch: " << SequentialSearch(sa_inp_0_s32, SIZE, 5) << "\n";
@@ -187,6 +199,66 @@ int main()
     StackPrint(&st_stk);
 
     maxSlidingWindows(sa_inp_11_s32, SIZE, 3);
+
+    cout << "\nTree\n";
+
+    treeNode* pst_t = levelOrderBinaryTree(sa_inp_12_s32, SIZE);
+    printPreOrder(pst_t);
+
+    freeTree(pst_t);
+}
+
+static treeNode* freeTree(treeNode* pst_root)
+{
+    if (NULL != pst_root)
+    {
+        pst_root->pst_lChild = freeTree(pst_root->pst_lChild);
+        pst_root->pst_rChild = freeTree(pst_root->pst_rChild);
+        if ((NULL == pst_root->pst_lChild) && (NULL == pst_root->pst_rChild))
+        {
+            free(pst_root);
+            return NULL;
+        }
+    }
+
+    return NULL;
+}
+
+static void printPreOrder(treeNode* pst_root)
+{
+    if (NULL != pst_root)
+    {
+        printf(" %d ", pst_root->value_s32);
+        printPreOrder(pst_root->pst_lChild);
+        printPreOrder(pst_root->pst_rChild);
+    }
+}
+
+static treeNode* levelOrderBinaryTreeUtil(int* p_array_s32, const int size_s32, int start_s32)
+{
+    treeNode* pst_curr = (treeNode*)malloc(sizeof(treeNode));
+    int left_s32 = (2 * start_s32) + 1;
+    int right_s32 = (2 * start_s32) + 2;
+
+    pst_curr->value_s32 = p_array_s32[start_s32];
+    pst_curr->pst_lChild = NULL;
+    pst_curr->pst_rChild = NULL;
+
+    if (left_s32 < size_s32)
+    {
+        pst_curr->pst_lChild = levelOrderBinaryTreeUtil(p_array_s32, size_s32, left_s32);
+    }
+    if (right_s32 < size_s32)
+    {
+        pst_curr->pst_rChild = levelOrderBinaryTreeUtil(p_array_s32, size_s32, right_s32);
+    }
+
+    return pst_curr;
+}
+
+static treeNode* levelOrderBinaryTree(int* p_array_s32, const int size_s32)
+{
+    return levelOrderBinaryTreeUtil(p_array_s32, size_s32, 0);
 }
 
 static void maxSlidingWindows(int* p_array_s32, const int size_s32, int window_s32)
