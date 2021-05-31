@@ -7,6 +7,12 @@ using namespace std;
 #define MAX_CAPACITY (1024)
 #define ERROR_VALUE (INT_MIN)
 
+typedef struct hashTable_t
+{
+    int size_s32;
+    int* p_array_s32;
+    char* p_flag_s8;
+} HashTable;
 typedef struct tNode
 {
     int value_s32;
@@ -31,6 +37,8 @@ typedef struct Node
     struct Node* pst_next;
 } ListNode;
 
+static unsigned int Hash(const int key_s32, const int size_s32);
+static int CollisionFunction(const int i_s32);
 static treeNode* freeTree(treeNode* pst_root);
 static void printPreOrder(treeNode* pst_root);
 static treeNode* levelOrderBinaryTreeUtil(int* p_array_s32, const int size_s32, int start_s32);
@@ -206,6 +214,88 @@ int main()
     printPreOrder(pst_t);
 
     freeTree(pst_t);
+}
+
+static unsigned int Hash(const int key_s32, const int size_s32)
+{
+    const unsigned int hashValue_s32 = key_s32;
+
+    return hashValue_s32 % size_s32;
+}
+
+static int CollisionFunction(const int i_s32)
+{
+    return i_s32;
+}
+
+static void HashInit(HashTable* pst_hTable, const int size_s32)
+{
+    int i_s32 = 0;
+
+    pst_hTable->size_s32 = size_s32;
+    pst_hTable->p_array_s32 = (int*)malloc(pst_hTable->size_s32 * sizeof(int));
+    pst_hTable->p_flag_s8 = (char*)malloc(pst_hTable->size_s32 * sizeof(char));
+
+    for (i_s32 = 0; i_s32 < pst_hTable->size_s32; i_s32++)
+    {
+        pst_hTable->p_flag_s8[i_s32] = EMPTY_NODE;
+    }
+}
+
+static int HashAdd(HashTable* pst_hTable, const int value_s32)
+{
+    int hashValue_s32 = Hash(value_s32, pst_hTable->size_s32);
+    int i_s32 = 0;
+    int ret_s32 = 0;
+
+    for (i_s32 = 0; i_s32 < pst_hTable->size_s32; i_s32++)
+    {
+        if ((EMPTY_NODE == pst_hTable->p_flag_s8[i_s32]) || (DELETED_NODE == pst_hTable->p_flag_s8[i_s32]))
+        {
+            pst_hTable->p_array_s32[hashValue_s32] = value_s32;
+            pst_hTable->p_flag_s8[hashValue_s32] = FILLED_NODE;
+            break;
+        }
+
+        hashValue_s32 += CollisionFunction(i_s32);
+        hashValue_s32 = hashValue_s32 % pst_hTable->size_s32;
+    }
+
+    if ((FILLED_NODE == pst_hTable->p_flag_s8[hashValue_s32]) && (value_s32 == pst_hTable->p_array_s32[hashValue_s32))
+    {
+        ret_s32 = 1;
+    }
+    else
+    {
+        ret_s32 = 0;
+    }
+
+    return ret_s32;
+}
+
+static int HashFind(HashTable* pst_hTable, const int value_s32)
+{
+    int hashValue_s32 = Hash(value_s32, pst_hTable->size_s32);
+    int i_s32 = 0;
+    int ret_s32 = 0;
+
+    for (i_s32 = 0; i_s32 < pst_hTable->size_s32; i_s32++)
+    {
+        if (((pst_hTable->p_flag_s8[hashValue_s32] == FILLED_NODE) && (pst_hTable->p_array_s32[hashValue_s32] == value_s32)) || (pst_hTable->p_flag_s8[hashValue_s32] == EMPTY_NODE))
+        {
+            break;
+        }
+
+        hashValue_s32 += CollisionFunction(i_s32);
+        hashValue_s32 = hashValue_s32 % pst_hTable->size_s32;
+    }
+
+    if ((pst_hTable->p_flag_s8[hashValue_s32] == FILLED_NODE) && (pst_hTable->p_array_s32[hashValue_s32] == value_s32))
+    {
+        ret_s32 = 1;
+    }
+
+    return ret_s32;
 }
 
 static treeNode* freeTree(treeNode* pst_root)
