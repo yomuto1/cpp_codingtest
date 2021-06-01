@@ -6,6 +6,9 @@ using namespace std;
 #define SIZE (10)
 #define MAX_CAPACITY (1024)
 #define ERROR_VALUE (INT_MIN)
+#define EMPTY_NODE (-1)
+#define DELETED_NODE (-2)
+#define FILLED_NODE (-3)
 
 typedef struct hashTable_t
 {
@@ -39,6 +42,11 @@ typedef struct Node
 
 static unsigned int Hash(const int key_s32, const int size_s32);
 static int CollisionFunction(const int i_s32);
+static void HashInit(HashTable* pst_hTable, const int size_s32);
+static int HashAdd(HashTable* pst_hTable, const int value_s32);
+static int HashFind(HashTable* pst_hTable, const int value_s32);
+static int HashRemove(HashTable* pst_hTable, const int value_s32);
+static void HashPrint(HashTable* pst_hTable);
 static treeNode* freeTree(treeNode* pst_root);
 static void printPreOrder(treeNode* pst_root);
 static treeNode* levelOrderBinaryTreeUtil(int* p_array_s32, const int size_s32, int start_s32);
@@ -214,6 +222,24 @@ int main()
     printPreOrder(pst_t);
 
     freeTree(pst_t);
+
+    cout << "\nHash\n";
+
+    HashTable st_myTable;
+
+    HashInit(&st_myTable, 10);
+    HashAdd(&st_myTable, 89);
+    HashAdd(&st_myTable, 89);
+    HashAdd(&st_myTable, 18);
+    HashAdd(&st_myTable, 49);
+    HashAdd(&st_myTable, 58);
+    HashAdd(&st_myTable, 69);
+    HashPrint(&st_myTable);
+    HashRemove(&st_myTable, 89);
+    HashRemove(&st_myTable, 89);
+    HashPrint(&st_myTable);
+    printf("Find 89: %d\n", HashFind(&st_myTable, 89));
+    printf("Find 18: %d\n", HashFind(&st_myTable, 18));
 }
 
 static unsigned int Hash(const int key_s32, const int size_s32)
@@ -225,7 +251,7 @@ static unsigned int Hash(const int key_s32, const int size_s32)
 
 static int CollisionFunction(const int i_s32)
 {
-    return i_s32;
+    return i_s32 * i_s32;
 }
 
 static void HashInit(HashTable* pst_hTable, const int size_s32)
@@ -261,7 +287,7 @@ static int HashAdd(HashTable* pst_hTable, const int value_s32)
         hashValue_s32 = hashValue_s32 % pst_hTable->size_s32;
     }
 
-    if ((FILLED_NODE == pst_hTable->p_flag_s8[hashValue_s32]) && (value_s32 == pst_hTable->p_array_s32[hashValue_s32))
+    if ((FILLED_NODE == pst_hTable->p_flag_s8[hashValue_s32]) && (value_s32 == pst_hTable->p_array_s32[hashValue_s32]))
     {
         ret_s32 = 1;
     }
@@ -296,6 +322,46 @@ static int HashFind(HashTable* pst_hTable, const int value_s32)
     }
 
     return ret_s32;
+}
+
+static int HashRemove(HashTable* pst_hTable, const int value_s32)
+{
+    int hashValue_s32 = Hash(value_s32, pst_hTable->size_s32);
+    int i_s32 = 0;
+    int ret_s32 = 0;
+
+    for (i_s32 = 0; i_s32 < pst_hTable->size_s32; i_s32++)
+    {
+        if (((pst_hTable->p_flag_s8[hashValue_s32] == FILLED_NODE) && (pst_hTable->p_array_s32[hashValue_s32] == value_s32)) || (pst_hTable->p_flag_s8[hashValue_s32] == EMPTY_NODE))
+        {
+            break;
+        }
+
+        hashValue_s32 += CollisionFunction(i_s32);
+        hashValue_s32 = hashValue_s32 % pst_hTable->size_s32;
+    }
+
+    if ((pst_hTable->p_flag_s8[hashValue_s32] == FILLED_NODE) && (pst_hTable->p_array_s32[hashValue_s32] == value_s32))
+    {
+        pst_hTable->p_flag_s8[hashValue_s32] = DELETED_NODE;
+        ret_s32 = 1;
+    }
+
+    return ret_s32;
+}
+
+static void HashPrint(HashTable* pst_hTable)
+{
+    int i_s32 = 0;
+
+    for (i_s32 = 0; i_s32 < pst_hTable->size_s32; i_s32++)
+    {
+        if (pst_hTable->p_flag_s8[i_s32] == FILLED_NODE)
+        {
+            printf("%d ", pst_hTable->p_array_s32[i_s32]);
+        }
+    }
+    printf("\n");
 }
 
 static treeNode* freeTree(treeNode* pst_root)
