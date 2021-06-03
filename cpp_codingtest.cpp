@@ -10,6 +10,11 @@ using namespace std;
 #define DELETED_NODE (-2)
 #define FILLED_NODE (-3)
 
+typedef struct graph
+{
+    int count_s32;
+    int** p_adj;
+} Graph;
 typedef struct hashTable_t
 {
     int size_s32;
@@ -40,6 +45,11 @@ typedef struct Node
     struct Node* pst_next;
 } ListNode;
 
+static int BruteForceSearch(const char* p_text, const char* p_pattern);
+static void graphInit(Graph* pst_graph, const int count_s32);
+static void addDirectedEdge(Graph* pst_graph, const int src_s32, const int dst_s32, const int cost_s32);
+static void addUndirectedEdge(Graph* pst_graph, const int src_s32, const int dst_s32, const int cost_s32);
+static void graphPrint(Graph* pst_graph);
 static unsigned int Hash(const int key_s32, const int size_s32);
 static int CollisionFunction(const int i_s32);
 static void HashInit(HashTable* pst_hTable, const int size_s32);
@@ -240,6 +250,93 @@ int main()
     HashPrint(&st_myTable);
     printf("Find 89: %d\n", HashFind(&st_myTable, 89));
     printf("Find 18: %d\n", HashFind(&st_myTable, 18));
+
+#if 0
+    cout << "\nGraph\n";
+
+    Graph st_graph;
+
+    graphInit(&st_graph, 4);
+    addUndirectedEdge(&st_graph, 0, 1, 1);
+    addUndirectedEdge(&st_graph, 0, 2, 1);
+    addUndirectedEdge(&st_graph, 1, 2, 1);
+    addUndirectedEdge(&st_graph, 2, 3, 1);
+    graphPrint(&st_graph);
+#endif
+
+    cout << "\ncharacter search\n";
+
+    const char* p_text = "this is a program in C";
+    const char* p_pattern = "program";
+
+    printf("%d\n", BruteForceSearch(p_text, p_pattern));
+}
+
+static int BruteForceSearch(const char* p_text, const char* p_pattern)
+{
+    const int n_s32 = strlen(p_text);
+    const int m_s32 = strlen(p_pattern);
+    int i_s32 = 0;
+    int j_s32 = 0;
+
+    for (i_s32 = 0; i_s32 <= (n_s32 - m_s32); i_s32++)
+    {
+        for (j_s32 = 0; j_s32 < m_s32; j_s32++)
+        {
+            if (p_pattern[j_s32] != p_text[i_s32 + j_s32])
+            {
+                break;
+            }
+        }
+
+        if (j_s32 == m_s32)
+        {
+            return i_s32;
+        }
+    }
+
+    return -1;
+}
+
+static void graphInit(Graph* pst_graph, const int count_s32)
+{
+    int i_s32 = 0;
+
+    pst_graph->count_s32 = count_s32;
+    pst_graph->p_adj = (int**)malloc(count_s32 * sizeof(int*));
+
+    for (i_s32 = 0; i_s32 < count_s32; i_s32++)
+    {
+        pst_graph->p_adj[i_s32] = (int*)malloc(count_s32 * sizeof(int));
+        memset(pst_graph->p_adj[i_s32], 0, count_s32 * sizeof(int));
+    }
+}
+
+static void addDirectedEdge(Graph* pst_graph, const int src_s32, const int dst_s32, const int cost_s32)
+{
+    pst_graph->p_adj[src_s32][dst_s32] = cost_s32;
+}
+
+static void addUndirectedEdge(Graph* pst_graph, const int src_s32, const int dst_s32, const int cost_s32)
+{
+    addDirectedEdge(pst_graph, src_s32, dst_s32, cost_s32);
+    addDirectedEdge(pst_graph, dst_s32, src_s32, cost_s32);
+}
+
+static void graphPrint(Graph* pst_graph)
+{
+    int count_s32 = pst_graph->count_s32;
+    int i_s32 = 0;
+    int j_s32 = 0;
+
+    for (i_s32 = 0; i_s32 < count_s32; i_s32++)
+    {
+        for (j_s32 = 0; j_s32 < count_s32; j_s32++)
+        {
+            printf("%d ", pst_graph->p_adj[i_s32][j_s32]);
+        }
+        printf("\n");
+    }
 }
 
 static unsigned int Hash(const int key_s32, const int size_s32)
@@ -276,7 +373,7 @@ static int HashAdd(HashTable* pst_hTable, const int value_s32)
 
     for (i_s32 = 0; i_s32 < pst_hTable->size_s32; i_s32++)
     {
-        if ((EMPTY_NODE == pst_hTable->p_flag_s8[i_s32]) || (DELETED_NODE == pst_hTable->p_flag_s8[i_s32]))
+        if ((EMPTY_NODE == pst_hTable->p_flag_s8[hashValue_s32]) || (DELETED_NODE == pst_hTable->p_flag_s8[hashValue_s32]))
         {
             pst_hTable->p_array_s32[hashValue_s32] = value_s32;
             pst_hTable->p_flag_s8[hashValue_s32] = FILLED_NODE;
