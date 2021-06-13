@@ -45,6 +45,8 @@ typedef struct Node
     struct Node* pst_next;
 } ListNode;
 
+static void reverseString(char* p_a, int lower_s32, int upper_s32);
+static void reverseWords(char* p_a);
 static int BruteForceSearch(const char* p_text, const char* p_pattern);
 static void graphInit(Graph* pst_graph, const int count_s32);
 static void addDirectedEdge(Graph* pst_graph, const int src_s32, const int dst_s32, const int cost_s32);
@@ -270,6 +272,51 @@ int main()
     const char* p_pattern = "program";
 
     printf("%d\n", BruteForceSearch(p_text, p_pattern));
+
+    char a_ch[100] = "Hello, World!";
+
+    reverseString(a_ch, 0, 12);
+    printf("%s\n", a_ch);
+    reverseWords(a_ch);
+    printf("%s\n", a_ch);
+}
+
+static void reverseString(char* p_a, int lower_s32, int upper_s32)
+{
+    char tempChar = 0;
+
+    while (lower_s32 < upper_s32)
+    {
+        tempChar = p_a[lower_s32];
+        p_a[lower_s32] = p_a[upper_s32];
+        p_a[upper_s32] = tempChar;
+        lower_s32++;
+        upper_s32--;
+    }
+}
+
+static void reverseWords(char* p_a)
+{
+    const int length_s32 = strlen(p_a);
+    int lower_s32 = 0;
+    int upper_s32 = -1;
+    int i_s32 = 0;
+
+    for (i_s32 = 0; i_s32 <= length_s32; i_s32++)
+    {
+        if ((' ' == p_a[i_s32]) || ('\0' == p_a[i_s32]))
+        {
+            reverseString(p_a, lower_s32, upper_s32);
+            lower_s32 = i_s32 + 1;
+            upper_s32 = i_s32;
+        }
+        else
+        {
+            upper_s32++;
+        }
+    }
+
+    reverseString(p_a, 0, length_s32 - 1);
 }
 
 static int BruteForceSearch(const char* p_text, const char* p_pattern)
