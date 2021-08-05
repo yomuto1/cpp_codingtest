@@ -1,5 +1,6 @@
 ﻿#include <array>
 #include <iostream>
+#include <vector>
 
 template <size_t N>
 static void print(const std::array<int, N>& arr)
@@ -57,6 +58,70 @@ int main(void)
 	std::cout << arr4.front() << std::endl;
 	std::cout << arr4.back() << std::endl;
 	std::cout << *(arr4.data() + 1) << std::endl;
+
+	std::vector<int> vec = { 1, 2, 3, 4, 5 };
+
+	for (int i_s32 = 0; i_s32 < vec.size(); i_s32++)
+	{
+		std::cout << vec[i_s32] << " ";
+	}
+	std::cout << std::endl;
+
+	vec.push_back(1);
+
+	for (int i_s32 = 0; i_s32 < vec.size(); i_s32++)
+	{
+		std::cout << vec[i_s32] << " ";
+	}
+	std::cout << std::endl;
+
+	vec.push_back(2);
+
+	for (int i_s32 = 0; i_s32 < vec.size(); i_s32++)
+	{
+		std::cout << vec[i_s32] << " ";
+	}
+	std::cout << std::endl;
+
+	vec.insert(vec.begin(), 0);
+
+	for (int i_s32 = 0; i_s32 < vec.size(); i_s32++)
+	{
+		std::cout << vec[i_s32] << " ";
+	}
+	std::cout << std::endl;
+
+	vec.insert(find(vec.begin(), vec.end(), 1), 4);
+
+	for (int i_s32 = 0; i_s32 < vec.size(); i_s32++)
+	{
+		std::cout << vec[i_s32] << " ";
+	}
+	std::cout << std::endl;
+
+	vec.pop_back();
+
+	for (int i_s32 = 0; i_s32 < vec.size(); i_s32++)
+	{
+		std::cout << vec[i_s32] << " ";
+	}
+	std::cout << std::endl;
+
+	vec.erase(vec.begin());
+
+	for (int i_s32 = 0; i_s32 < vec.size(); i_s32++)
+	{
+		std::cout << vec[i_s32] << " ";
+	}
+	std::cout << std::endl;
+
+	vec.erase(vec.begin() + 1, vec.begin() + 4);
+
+	for (int i_s32 = 0; i_s32 < vec.size(); i_s32++)
+	{
+		std::cout << vec[i_s32] << " ";
+	}
+	std::cout << std::endl;
 
 	return 0;
 }
