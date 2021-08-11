@@ -1,6 +1,13 @@
 ﻿#include <array>
 #include <iostream>
 #include <vector>
+#include <forward_list>
+
+struct citizen
+{
+	std::string name;
+	int age;
+};
 
 template <size_t N>
 static void print(const std::array<int, N>& arr)
@@ -19,6 +26,20 @@ static void print(const std::array<int, N>& arr)
 #endif
 
 	std::cout << std::endl;
+}
+
+static void print(const std::vector<int>& vec)
+{
+	for (int i_s32 = 0; i_s32 < vec.size(); i_s32++)
+	{
+		std::cout << vec[i_s32] << " ";
+	}
+	std::cout << std::endl;
+}
+
+std::ostream& operator<<(std::ostream& os, const citizen& c)
+{
+	return (os << "[" << c.name << ", " << c.age << "]");
 }
 
 int main(void)
@@ -61,65 +82,59 @@ int main(void)
 
 	std::vector<int> vec = { 1, 2, 3, 4, 5 };
 
-	for (int i_s32 = 0; i_s32 < vec.size(); i_s32++)
-	{
-		std::cout << vec[i_s32] << " ";
-	}
-	std::cout << std::endl;
+	print(vec);
 
 	vec.push_back(1);
 
-	for (int i_s32 = 0; i_s32 < vec.size(); i_s32++)
-	{
-		std::cout << vec[i_s32] << " ";
-	}
-	std::cout << std::endl;
+	print(vec);
 
 	vec.push_back(2);
 
-	for (int i_s32 = 0; i_s32 < vec.size(); i_s32++)
-	{
-		std::cout << vec[i_s32] << " ";
-	}
-	std::cout << std::endl;
+	print(vec);
 
 	vec.insert(vec.begin(), 0);
 
-	for (int i_s32 = 0; i_s32 < vec.size(); i_s32++)
-	{
-		std::cout << vec[i_s32] << " ";
-	}
-	std::cout << std::endl;
+	print(vec);
 
 	vec.insert(find(vec.begin(), vec.end(), 1), 4);
 
-	for (int i_s32 = 0; i_s32 < vec.size(); i_s32++)
-	{
-		std::cout << vec[i_s32] << " ";
-	}
-	std::cout << std::endl;
+	print(vec);
 
 	vec.pop_back();
 
-	for (int i_s32 = 0; i_s32 < vec.size(); i_s32++)
-	{
-		std::cout << vec[i_s32] << " ";
-	}
-	std::cout << std::endl;
+	print(vec);
 
 	vec.erase(vec.begin());
 
-	for (int i_s32 = 0; i_s32 < vec.size(); i_s32++)
-	{
-		std::cout << vec[i_s32] << " ";
-	}
-	std::cout << std::endl;
+	print(vec);
 
 	vec.erase(vec.begin() + 1, vec.begin() + 4);
 
-	for (int i_s32 = 0; i_s32 < vec.size(); i_s32++)
+	print(vec);
+
+	std::forward_list<citizen> citizens = { {"kim", 22}, {"lee", 25}, {"park", 18}, {"jin", 16} };
+
+	citizens.sort([](const citizen& c1, const citizen& c2)
 	{
-		std::cout << vec[i_s32] << " ";
+		return c1.age > c2.age;
+	});
+
+	std::cout << "whole citizens: ";
+	for (const auto& c : citizens)
+	{
+		std::cout << c << " ";
+	}
+	std::cout << std::endl;
+
+	citizens.remove_if([](const citizen& c)
+	{
+		return (c.age < 19);
+	});
+
+	std::cout << "citizens that have vote: ";
+	for (const auto& c : citizens)
+	{
+		std::cout << c << " ";
 	}
 	std::cout << std::endl;
 
